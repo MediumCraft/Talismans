@@ -42,6 +42,7 @@ allprojects {
         compileOnly("org.jetbrains.kotlin:kotlin-stdlib:1.9.20")
 
         implementation("com.willfp:ecomponent:1.3.0")
+        implementation("com.willfp:libreforge:${libreforgeVersion}")
     }
 
     java {
@@ -52,6 +53,7 @@ allprojects {
     tasks {
         shadowJar {
             relocate("com.willfp.libreforge.loader", "com.willfp.talismans.libreforge.loader")
+            relocate("com.willfp.libreforge", "com.willfp.talismans.libreforge")
             relocate("com.willfp.ecomponent", "com.willfp.talismans.ecomponent")
         }
 
