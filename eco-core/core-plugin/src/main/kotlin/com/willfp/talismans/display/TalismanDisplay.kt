@@ -4,6 +4,8 @@ import com.willfp.eco.core.EcoPlugin
 import com.willfp.eco.core.display.Display
 import com.willfp.eco.core.display.DisplayModule
 import com.willfp.eco.core.display.DisplayPriority
+import com.willfp.eco.core.placeholder.context.placeholderContext
+import com.willfp.eco.util.formatEco
 import com.willfp.libreforge.ItemProvidedHolder
 import com.willfp.talismans.talismans.util.TalismanChecks
 import com.willfp.talismans.talismans.util.TalismanUtils
@@ -26,19 +28,29 @@ class TalismanDisplay(plugin: EcoPlugin) : DisplayModule(plugin, DisplayPriority
 
         val talisman = TalismanChecks.getTalismanOnItem(itemStack) ?: return
 
-        meta.setDisplayName(talisman.name)
+        val placeholderContext = placeholderContext(
+            player = player,
+            item = itemStack
+        )
+
+        meta.setDisplayName(talisman.name.formatEco(placeholderContext))
+
         if (talisman.itemStack.itemMeta?.hasCustomModelData() == true) {
             meta.setCustomModelData(talisman.itemStack.itemMeta?.customModelData)
         }
 
         val lore = mutableListOf<String>()
 
-        lore.addAll(talisman.description)
+        lore.addAll(
+            talisman.description
+                .map { Display.PREFIX + it.formatEco(placeholderContext) }
+        )
+
         lore.addAll(itemLore)
 
         if (player != null) {
             val provided = ItemProvidedHolder(talisman, itemStack)
-            val lines = talisman.conditions.getNotMetLines(player, provided).map { Display.PREFIX + it }
+            val lines = provided.getNotMetLines(player).map { Display.PREFIX + it }
 
             if (lines.isNotEmpty()) {
                 lore.add(Display.PREFIX)
